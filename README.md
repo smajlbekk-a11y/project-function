@@ -1,34 +1,48 @@
-# Neural Network Training & Analysis
+Activation Analysis: Жылдам Бастау
 
-Жоба әртүрлі активация функциялары (`sigmoid`, `tanh`, `relu`) мен learning rate параметрлерін тексеріп, нейрондық желінің оқу процесін талдайды. Нәтижелер CSV файлдарға сақталып, графиктер арқылы салыстырылады.
+Бұл жоба MLP моделінің өнімділігін 3 активация функциясы (sigmoid, tanh, relu) және 4 оқыту жылдамдығы (0.1 ден 0.0001 дейін) бойынша салыстырады.
 
-## Қолдану
+1. Қолдану
 
-### Нейрондық желіні оқу
-```bash
-python src/train.py --activation sigmoid
-python src/train.py --activation tanh
-python src/train.py --activation relu
-Нәтижелерді біріктіру және салыстыру
-bash
-Копировать код
-python src/compare_plots.py
-python src/combine_results.py
-Learning Rate және Activation әсерін графикте көрсету
-python
-Копировать код
+Қадам 1: Барлық Эксперименттерді Оқыту және Нәтижелерді Біріктіру
+
+Барлық 12 комбинацияны (3x4) автоматты түрде іске қосу және нәтижелерді бір файлға біріктіру.
+
+# Барлық оқыту процестерін іске қосу және нәтижелерді results/combined_lr_history.csv файлына жинау
+!python src/run_all_experiments.py
+
+
+Қадам 2: Нәтижелерді Визуализациялау
+
+Біріктірілген файл негізінде негізгі графиктерді құру.
+
+1. Валидация Дәлдігі vs Learning Rate (LR)
+
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
 data = pd.read_csv('results/combined_lr_history.csv')
+
+# Дәлдікті LR және Активация бойынша көрсету
+plt.figure(figsize=(10, 6))
 sns.lineplot(data=data, x='epoch', y='val_acc', hue='learning_rate', style='activation')
+plt.title("Validation Accuracy vs Learning Rate")
 plt.show()
-Нәтижелер
-Validation Accuracy және Train Loss динамикасы
 
-Орташа көрсеткіштерді салыстыру
 
-Efficiency (Accuracy per second)
+2. Тиімділік (Accuracy per second) Бағасы
 
-Барлық нәтижелер results/ папкасында сақталады.
+# Тиімділікті есептеу
+data['efficiency'] = data['val_acc'] / data['epoch_time_sec']
+
+# Тиімділікті Learning Rate және Activation бойынша салыстыру
+plt.figure(figsize=(10, 6))
+sns.barplot(data=data, x='learning_rate', y='efficiency', hue='activation')
+plt.title("Efficiency (Accuracy per second) by LR and Activation")
+plt.show()
+
+
+2. Қорытынды
+
+Нәтижелер: Барлық нәтижелер (CSV, логтар, графиктер) results/ папкасында сақталады.
